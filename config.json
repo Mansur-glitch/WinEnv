@@ -1,0 +1,41 @@
+{
+  "ROOT_OFFSET": "../../../",
+  "APPS_DIR": "envw64/apps",
+  "APPS_DATA": "envw64/appdata",
+  "XDGHOME": "envw64/appdata",
+  "APPS_BIN_PATHS": [
+    "vscodew7/bin",
+	"vcpkg",
+	"chromew7"
+  ],
+
+  "TERM_COLOR_TABLE": [
+    "32,32,32",             // black
+    "53,101,121",           // blue
+    "129,149,124",          // green
+    "11,52,82",             // cyan
+    "185,30,46",            // red
+    "45,32,49",             // magenta
+    "249,187,128",          // yellow
+    "144,144,144",          // white
+    "96,96,96",             // intensive black
+    "116,145,161",          // intensive blue
+    "167,183,128",          // intensive green
+    "15,130,157",           // intensive cyan
+    "209,69,72",            // intensive red
+    "135,49,78",            // intensive magenta
+    "250,227,160",          // intensive yellow
+    "255,240,240"           // intensive white
+  ],
+  "COLOR_FG": 7,
+  "COLOR_BG": 0,
+  "FONT_NAME": "Agave Nerd Font Mono",
+  "FONT_SIZE": 19,
+  "COLUMNS": 80,
+  "ROWS": 50, 
+
+  "HK_SPAWN_CMD": "alt C",
+  "HK_LAUNCH_BROWSER": "alt B",
+  "HK_FILE_PICK": "alt P",
+  "HK_EXIT": "alt E"
+}
