@@ -145,8 +145,8 @@ std::string RootApp::configure_hotkeys() {
                                method_handle(&RootApp::spawn_cmd_khandler));
   add_key_handling_with_backup(
       m_config.file_pick_hk, method_handle(&RootApp::show_file_drop_khandler));
-  add_key_handling_with_backup("nr alt T"_hk,
-                               method_handle(&RootApp::test_khandler));
+  add_key_handling_with_backup(m_config.launch_browser_hk,
+                               method_handle(&RootApp::browser_khandler));
   return log_msg;
 }
 
@@ -241,7 +241,7 @@ LRESULT RootApp::exit_khandler(const MSG &msg) {
   return 0;
 }
 
-LRESULT RootApp::test_khandler(const MSG &msg) {
+LRESULT RootApp::browser_khandler(const MSG &msg) {
   if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
     m_log_wnd.print("No text info available in the clipboard");
     m_log_wnd.show_for(1'000);
@@ -252,16 +252,22 @@ LRESULT RootApp::test_khandler(const MSG &msg) {
     m_log_wnd.show_for(1'000);
     return 0;
   }
-  // https://www.google.com/search?q=
   std::wstring launch_command = L"/C start /B chrome.exe";
   LPWSTR clipboard_text{nullptr};
   HGLOBAL hglb = GetClipboardData(CF_UNICODETEXT);
   if (hglb != nullptr) {
     clipboard_text = reinterpret_cast<LPWSTR>(GlobalLock(hglb));
     if (clipboard_text != nullptr) {
-      launch_command += L' ';
-      launch_command += clipboard_text;
+      std::wstring clipboard_copy {clipboard_text};
       GlobalUnlock(hglb);
+      launch_command += L' ';
+      // Необходимо сформировать правильный адресс
+      if (clipboard_copy.substr(0,4) != L"http") {
+        launch_command += L"https://www.google.com/search?q=";
+        // Пробелы - недопустимы
+        std::replace(clipboard_copy.begin(), clipboard_copy.end(), L' ', L'+');
+      }
+      launch_command += clipboard_copy;
     }
   }
   CloseClipboard();
@@ -280,19 +286,24 @@ LRESULT RootApp::file_drop_msg_handler(const MSG &msg) {
 
   std::wstring file_name;
   file_name.resize(g_max_file_path);
-  std::wstring launch_command{L"/K nvim "};
+  std::wstring launch_command{L"/C start /B nvim-qt.exe"};
   HDROP hdrop = (HDROP)msg.wParam;
   // Получаем число переданных файлов через специальное значение параметра
   UINT n_files =
       DragQueryFileW(hdrop, 0xFFFFFFFF, file_name.data(), g_max_file_path);
   for (UINT i = 0; i < n_files; ++i) {
     DragQueryFileW(hdrop, i, file_name.data(), g_max_file_path);
-    launch_command += file_name.c_str();
     launch_command += L' ';
+    launch_command += file_name.c_str();
   }
   DragFinish(hdrop);
-  launch_command.resize(launch_command.size() - 1); // Отсекаем последний пробел
-  create_child_console(launch_command);
+
+  std::wstring program_path_str = get_cmd_path().wstring();
+  std::wstring launch_directory{m_cmd_launch_dir.wstring()};
+  WinProcess proc = WinProcess::Constructor()
+                        .set_command_line_arguments(launch_command.c_str())
+                        .set_startup_directory(launch_directory)
+                        .create(program_path_str, L"NVIM");
   return 0;
 }
 

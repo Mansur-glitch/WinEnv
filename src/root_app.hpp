@@ -50,7 +50,7 @@ private:
   LRESULT show_file_drop_khandler(const MSG &msg);
   // Вызывает завершение работы программы
   LRESULT exit_khandler(const MSG &msg);
-  LRESULT test_khandler(const MSG &msg);
+  LRESULT browser_khandler(const MSG &msg);
   LRESULT file_drop_msg_handler(const MSG &msg);
   LRESULT log_wnd_2clk_handler(const MSG &msg);
   LRESULT paint_file_wnd(const MSG &msg);

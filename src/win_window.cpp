@@ -8,14 +8,8 @@ WinWindow WinWindow::Constructor::create(HINSTANCE app_hinstance,
                                          EventDispatcher &event_dispatcher) {
   // std::uniform_int_distribution<std::mt19937::result_type> dist6(1, 0xffff);
 
-  *g_logger << "Window with id " + std::to_string(s_last_used_id + 1) +
-                   " is being created"
-            << std::endl;
   // Необходимо уникальное название
   std::string class_name = std::to_string(s_last_used_id + 1) + "_unique";
-  *g_logger << "Window class with id " + std::to_string(s_last_used_id + 1) +
-                   " name got"
-            << std::endl;
   WNDCLASSA wc;
   wc.style = m_clss_style;
   wc.cbClsExtra = sizeof(LONG_PTR) * 2;
@@ -31,14 +25,9 @@ WinWindow WinWindow::Constructor::create(HINSTANCE app_hinstance,
 
   if (!RegisterClassA(&wc)) {
     --class_id;
-    *g_logger << "Window class with id " + std::to_string(class_id) +
-                     " reg failed"
-              << std::endl;
     throw WinError("Window class registration failed", GetLastError());
   }
-  *g_logger << "Window class with id " + std::to_string(class_id) +
-                   " registered"
-            << std::endl;
+  // Создаем окно-пустышку для того, чтобы задать информацию для класса окон
   {
     HWND class_wnd =
         CreateWindowExA(0, wc.lpszClassName, "", 0, 0, 0, 0, 0, HWND_MESSAGE,
@@ -46,15 +35,9 @@ WinWindow WinWindow::Constructor::create(HINSTANCE app_hinstance,
     if (!class_wnd) {
       throw WinError("Failed to create class window", GetLastError());
     }
-    *g_logger << "Window class with id " + std::to_string(class_id) +
-                     " temp wnd created"
-              << std::endl;
     SetClassLongPtrA(class_wnd, 0,
                      reinterpret_cast<LONG_PTR>(&event_dispatcher));
     SetClassLongPtrA(class_wnd, sizeof(LONG_PTR), class_id);
-    *g_logger << "Window class with id " + std::to_string(class_id) +
-                     " temp before destroy"
-              << std::endl;
     DestroyWindow(class_wnd);
   }
   WinWindow wnd;
@@ -77,10 +60,6 @@ WinWindow WinWindow::Constructor::create(HINSTANCE app_hinstance,
   for (auto [msg_code, handler] : m_msg_handlers) {
     event_dispatcher.add_message_handling(class_id, msg_code, handler);
   }
-  *g_logger << "Window with id " + std::to_string(class_id) +
-                   " added destroy handler"
-            << std::endl;
-
   wnd.m_hwnd = CreateWindowExA(m_wnd_exstyle, wc.lpszClassName, "Class",
                                m_wnd_style, m_x, m_y, m_width, m_height,
                                nullptr, nullptr, app_hinstance, nullptr);
@@ -89,15 +68,8 @@ WinWindow WinWindow::Constructor::create(HINSTANCE app_hinstance,
     wnd.mpf_quit = nullptr;
     throw WinError("Window creation failed", GetLastError());
   }
-  *g_logger << "Window with id " + std::to_string(class_id) +
-                   " returned from createwindowexa()"
-            << std::endl;
-
   ShowWindow(wnd.m_hwnd, m_show_flag);
   UpdateWindow(wnd.m_hwnd);
-
-  *g_logger << "Window with id " + std::to_string(wnd.m_id) + " created"
-            << std::endl;
   return wnd;
 }
 
@@ -221,11 +193,7 @@ void WinWindow::destroy() {
 }
 
 WinWindow::~WinWindow() {
-  *g_logger << "Window with id " + std::to_string(m_id) + " is being destruct"
-            << std::endl;
   destroy();
-  *g_logger << "Window with id " + std::to_string(m_id) + " destructed"
-            << std::endl;
 }
 
 WinWindow::WinWindow(WinWindow &&other) noexcept
