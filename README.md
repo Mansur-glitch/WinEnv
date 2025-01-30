@@ -1,4 +1,4 @@
-выше# WinEnv
+# WinEnv
 Utility to help create portable environment in Windows
 Works in Windows 7 and higher
 
