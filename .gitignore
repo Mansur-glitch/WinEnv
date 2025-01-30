@@ -1,0 +1,5 @@
+build/
+fonts/
+CMakePresets.json
+*.cmd
+.vscode

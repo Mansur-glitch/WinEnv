@@ -169,15 +169,17 @@ void RootApp::add_con_font_to_registry(std::string font_name) {
 
   hkey = open_con_font_hkey(ret_code, KEY_WRITE);
   if (ret_code != ERROR_SUCCESS) {
-    std::string warning_msg =
-        "Failed to open console font registry key for write\n";
+    std::string warning_msg = log_text_top;
+    warning_msg += "Failed to open console font registry key for write\n";
     warning_msg += "Error code: ";
     warning_msg += std::to_string(ret_code);
     warning_msg += "\nTrying elevate privileges...";
+    warning_msg += log_text_bottom;
     m_log_wnd.print(warning_msg);
     m_log_wnd.show(true);
     while (m_log_wnd.is_shown()) {
       m_dispatcher.dispatch({0, 0}, m_log_wnd.get_hwnd());
+      Sleep(50);
     }
     std::wstring cmd_arg = L"font " + widen_string(font_name);
     run_as_admin(m_programm_path.wstring(), cmd_arg);

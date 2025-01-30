@@ -1,5 +1,5 @@
 {
-  "ROOT_OFFSET": "../../../",
+  "ROOT_OFFSET": "../../../../",
   "APPS_DIR": "envw64/apps",
   "APPS_DATA": "envw64/appdata",
   "XDGHOME": "envw64/appdata",
